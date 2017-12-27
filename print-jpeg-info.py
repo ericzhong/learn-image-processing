@@ -14,8 +14,11 @@ def get_segment_name(val):
         return 'compressed'
     elif 0xe0 <= val <= 0xef:
         return 'APP%s' % int(val-0xe0)
+    key = hex(val)
+    if key in name:
+        return name[key]
     else:
-        return name[hex(val)]
+        return key
 
 
 def get_header(f):
@@ -39,7 +42,8 @@ def get_segments(f):
 
         # skip all 0xff between segments
         while True:
-            if f.read(1)[0] == 0xff:
+            if f.read(1)[0] != 0xff:
+                f.seek(-1, os.SEEK_CUR)
                 break
         
         header = f.read(3)
